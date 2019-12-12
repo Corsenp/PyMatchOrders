@@ -133,3 +133,6 @@ dmypy.json
 
 # PIPFILE
 Pipfile.lock
+
+# matches
+matches.csv
