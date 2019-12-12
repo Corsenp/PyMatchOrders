@@ -8,7 +8,7 @@ class Order:
         self.pair = pair
         self.action = action
         self.price = price
-        self.match = ""
+        self.match = "match"
 
 def init_order(row):
     '''
@@ -56,7 +56,7 @@ def parse_orders(orders):
                     orders[y].pair == orders[i].pair and\
                     orders[y].action != orders[i].action and\
                     orders[y].account != orders[i].account and\
-                    orders[y].match == "" and orders[i].match == ""):
+                    orders[y].match == "match" and orders[i].match == "match"):
                         orders[i].match = orders[y].id
                         orders[y].match = orders[i].id
                 y += 1
@@ -73,7 +73,7 @@ def reject_undone_trade(orders):
         i = 1
         order_len = len(orders) - 1
         while i <= order_len:
-            if orders[i].match == "":
+            if orders[i].match == "match":
                 orders[i].match = "REJECTED"
             i = i + 1
     except:
@@ -93,10 +93,39 @@ def prompt_orders(orders):
             print('{}, {}, {}, {}, {}, {}'.format(orders[i].id, orders[i].account, orders[i].pair, orders[i].action, orders[i].price, orders[i].match))
         i += 1
 
+def write_csv(orders):
+    try:
+        with open('matches.csv', mode='w') as csv_file:
+            orders_len = len(orders) - 1
+            i = 0
+            fieldnames = [
+                orders[0].id,
+                orders[0].account,
+                orders[0].pair,
+                orders[0].action,
+                orders[0].price,
+                orders[0].match
+            ]
+            writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+            while i <= orders_len:
+                writer.writerow({
+                    orders[0].id : orders[i].id,
+                    orders[0].account : orders[i].account,
+                    orders[0].pair : orders[i].pair,
+                    orders[0].action : orders[i].action,
+                    orders[0].price : orders[i].price,
+                    orders[0].match : orders[i].match,
+                    })
+                i += 1
+
+    except:
+        print("Error while writing matches to CSV")
+        sys.exit(-1)
+
 def ask_user_csv(orders):
     answer = input("Do you want the result exported to a csv (y/n) ?\n")
     if answer == 'y' or answer == 'yes':
-        print("must be exported to a csv")
+        write_csv(orders)
         return 1
     elif answer == 'n' or answer == 'no':
         prompt_orders(orders)
